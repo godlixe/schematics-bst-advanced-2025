@@ -83,6 +83,7 @@ func getBlogByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Error(w, "blog not found", http.StatusNotFound)
 }
+
 func main() {
 	mux := http.NewServeMux()
 
@@ -92,5 +93,4 @@ func main() {
 
 	fmt.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(":8080", mux)
-
 }
