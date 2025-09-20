@@ -68,7 +68,7 @@ func (c *BlogController) GetAll(ctx *gin.Context) {
 }
 
 func (c *BlogController) Create(ctx *gin.Context) {
-	var input dto.BlogDTO
+	var input dto.CreateBlogDTO
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ve, _ := validatorx.ParseValidatorErrors(err)
 		ctx.JSON(http.StatusBadRequest, apix.HTTPResponse{
@@ -105,7 +105,7 @@ func (c *BlogController) Update(ctx *gin.Context) {
 		})
 		return
 	}
-	var input dto.BlogDTO
+	var input dto.UpdateBlogDTO
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, apix.HTTPResponse{
 			Message: fmt.Sprintf("input data invalid %v", err),
@@ -152,5 +152,8 @@ func (c *BlogController) Delete(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.Status(http.StatusNoContent)
+	ctx.JSON(http.StatusOK, apix.HTTPResponse{
+		Message: "delete blog successful",
+		Data:    nil,
+	})
 }

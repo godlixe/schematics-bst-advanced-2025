@@ -38,12 +38,26 @@ func (s *blogService) GetAll() ([]model.Blog, error) {
 }
 
 func (s *blogService) Update(blog model.Blog) (model.Blog, error) {
-	_, err := s.blogRepository.GetByID(blog.ID)
+	existing, err := s.blogRepository.GetByID(blog.ID)
 	if err != nil {
 		return model.Blog{}, err
 	}
-	blog.Timestamp = time.Now()
-	return s.blogRepository.Update(blog)
+
+	if blog.Title != "" {
+		existing.Title = blog.Title
+	}
+
+	if blog.Author != "" {
+		existing.Author = blog.Author
+	}
+
+	if blog.Content != "" {
+		existing.Content = blog.Content
+	}
+
+	existing.Timestamp = time.Now()
+
+	return s.blogRepository.Update(existing)
 }
 
 func (s *blogService) Delete(id int) error {

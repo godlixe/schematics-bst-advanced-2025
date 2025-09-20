@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"contoh-3/controller"
+	"contoh-3/middleware"
 	"contoh-3/repository"
 	"contoh-3/routes"
 	"contoh-3/service"
@@ -17,6 +18,8 @@ func main() {
 	blogCtrl := controller.NewBlogController(blogSvc)
 
 	r := gin.Default()
+	r.Use(gin.Recovery())
+	r.Use(middleware.CustomLogger())
 
 	routes.BlogRoutes(r, blogCtrl)
 

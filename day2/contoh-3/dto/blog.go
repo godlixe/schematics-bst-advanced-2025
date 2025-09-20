@@ -1,7 +1,13 @@
 package dto
 
-type BlogDTO struct {
-	Title   string `json:"title" binding:"required"`
-	Content string `json:"content" binding:"required"`
-	Author  string `json:"author" binding:"required"`
+type CreateBlogDTO struct {
+	Title   string `json:"title,omitempty" binding:"required"`
+	Content string `json:"content,omitempty" binding:"required"`
+	Author  string `json:"author,omitempty" binding:"required"`
+}
+
+type UpdateBlogDTO struct {
+	Title   string `json:"title,omitempty"`
+	Content string `json:"content,omitempty"`
+	Author  string `json:"author,omitempty"`
 }

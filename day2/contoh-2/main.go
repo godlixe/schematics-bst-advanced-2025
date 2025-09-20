@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -52,8 +54,24 @@ func createBlogsHandler(w http.ResponseWriter, r *http.Request) {
 // GET /blogs
 // Digunakan untuk mendapatkan semua entry blog.
 func getAllBlogsHandler(w http.ResponseWriter, r *http.Request) {
+	sortParam := strings.ToLower(r.URL.Query().Get("sort"))
+
+	blogs := make([]Blog, len(Database))
+	// copy datanya agar database tidak terubah
+	copy(blogs, Database)
+
+	if sortParam == "asc" {
+		sort.Slice(blogs, func(i, j int) bool {
+			return blogs[i].Title < blogs[j].Title
+		})
+	} else if sortParam == "desc" {
+		sort.Slice(blogs, func(i, j int) bool {
+			return blogs[i].Title > blogs[j].Title
+		})
+	}
+
 	var response = Response{
-		Data:    Database,
+		Data:    blogs,
 		Message: "get all blogs successful",
 	}
 
@@ -84,6 +102,16 @@ func getBlogByIDHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "blog not found", http.StatusNotFound)
 }
 
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+
+		duration := time.Since(start)
+		fmt.Printf("%s %s in %v\n", r.Method, r.URL.Path, duration)
+	})
+}
+
 func main() {
 	mux := http.NewServeMux()
 
@@ -92,5 +120,5 @@ func main() {
 	mux.HandleFunc("GET /blogs/{id}", getBlogByIDHandler)
 
 	fmt.Println("Server running on http://localhost:8080")
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":8080", LoggingMiddleware(mux))
 }
