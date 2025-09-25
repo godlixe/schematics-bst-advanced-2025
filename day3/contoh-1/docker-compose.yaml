@@ -1,0 +1,24 @@
+services:
+  db_blog:
+    container_name: db_blog
+    image: postgres:16.0-alpine
+    restart: unless-stopped
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "main"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      - system
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+networks:
+  system:
+    driver: bridge
