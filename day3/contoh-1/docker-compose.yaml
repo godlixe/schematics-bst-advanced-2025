@@ -17,7 +17,10 @@ services:
     networks:
       - system
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
 
 networks:
   system:

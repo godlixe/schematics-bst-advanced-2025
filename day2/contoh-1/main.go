@@ -15,6 +15,7 @@ func textHelloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", textHelloHandler)
+	http.HandleFunc("/text", textHelloHandler)
+	http.HandleFunc("/json", jsonHelloHandler)
 	http.ListenAndServe(":8080", nil)
 }
