@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"contoh-2/dto"
 	"contoh-2/model"
@@ -16,6 +17,7 @@ type BlogService interface {
 	Create(blog *model.Blog) (*model.Blog, error)
 	GetByID(id int) (*model.Blog, error)
 	GetAll() ([]model.Blog, error)
+	GetByTagIDs(tagIDs []int) ([]model.Blog, error)
 	Update(blog *model.Blog) (*model.Blog, error)
 	Delete(id int) error
 }
@@ -52,7 +54,26 @@ func (c *BlogController) GetByID(ctx *gin.Context) {
 }
 
 func (c *BlogController) GetAll(ctx *gin.Context) {
-	blogs, err := c.blogService.GetAll()
+	tagIDsStr := ctx.Query("tag_ids")
+
+	var blogs []model.Blog
+	var err error
+
+	if tagIDsStr != "" {
+		// Parse comma-separated tag IDs
+		tagIDs, parseErr := parseTagIDs(tagIDsStr)
+		if parseErr != nil {
+			ctx.JSON(http.StatusBadRequest, apix.HTTPResponse{
+				Message: "invalid tag_ids format",
+				Data:    parseErr.Error(),
+			})
+			return
+		}
+		blogs, err = c.blogService.GetByTagIDs(tagIDs)
+	} else {
+		blogs, err = c.blogService.GetAll()
+	}
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, apix.HTTPResponse{
 			Message: "failed to get blogs",
@@ -60,6 +81,7 @@ func (c *BlogController) GetAll(ctx *gin.Context) {
 		})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, apix.HTTPResponse{
 		Message: "get all blogs success",
 		Data:    blogs,
@@ -159,4 +181,29 @@ func (c *BlogController) Delete(ctx *gin.Context) {
 		Message: "delete blog successful",
 		Data:    nil,
 	})
+}
+
+// parseTagIDs parses comma-separated tag IDs from query parameter
+func parseTagIDs(tagIDsStr string) ([]int, error) {
+	if tagIDsStr == "" {
+		return nil, nil
+	}
+
+	parts := strings.Split(tagIDsStr, ",")
+	tagIDs := make([]int, 0, len(parts))
+
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+
+		id, err := strconv.Atoi(part)
+		if err != nil {
+			return nil, err
+		}
+		tagIDs = append(tagIDs, id)
+	}
+
+	return tagIDs, nil
 }

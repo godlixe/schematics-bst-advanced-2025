@@ -9,6 +9,7 @@ type BlogRepository interface {
 	Create(blog *model.Blog) (*model.Blog, error)
 	GetByID(id int) (*model.Blog, error)
 	GetAll() ([]model.Blog, error)
+	GetByTagIDs(tagIDs []int) ([]model.Blog, error)
 	Update(blog *model.Blog) (*model.Blog, error)
 	Delete(id int) error
 }
@@ -42,6 +43,10 @@ func (s *blogService) GetByID(id int) (*model.Blog, error) {
 
 func (s *blogService) GetAll() ([]model.Blog, error) {
 	return s.blogRepository.GetAll()
+}
+
+func (s *blogService) GetByTagIDs(tagIDs []int) ([]model.Blog, error) {
+	return s.blogRepository.GetByTagIDs(tagIDs)
 }
 
 func (s *blogService) Update(blog *model.Blog) (*model.Blog, error) {

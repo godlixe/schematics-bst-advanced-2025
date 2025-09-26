@@ -45,6 +45,16 @@ func (r *BlogRepository) GetAll() ([]model.Blog, error) {
 	return blogs, nil
 }
 
+func (r *BlogRepository) GetByTagIDs(tagIDs []int) ([]model.Blog, error) {
+	var blogs []model.Blog
+	tx := r.db.Preload("Comments").Preload("Tags").Where("id IN (SELECT blog_id FROM blogs_tags WHERE tag_id IN ?)", tagIDs).Find(&blogs)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return blogs, nil
+}
+
 func (r *BlogRepository) Update(blog *model.Blog) (*model.Blog, error) {
 	tx := r.db.Where("id = ?", blog.ID).Updates(blog)
 	if tx.Error != nil {
