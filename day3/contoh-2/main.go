@@ -19,9 +19,10 @@ func main() {
 	godotenv.Load()
 	db := database.ConnectDatabase()
 
+	// Ensure referenced tables are created before dependents
 	db.AutoMigrate(
-		model.Blog{},
 		model.User{},
+		model.Blog{},
 		model.Comment{},
 		model.Tag{},
 		model.BlogsTags{},

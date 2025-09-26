@@ -82,7 +82,6 @@ func (c *BlogController) Create(ctx *gin.Context) {
 		UserID:  userID,
 		Title:   input.Title,
 		Content: input.Content,
-		Author:  input.Author,
 	}
 
 	created, err := c.blogService.Create(&blog)

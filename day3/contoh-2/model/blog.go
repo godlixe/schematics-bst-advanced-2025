@@ -9,7 +9,7 @@ type Blog struct {
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	Author    string    `json:"author"`
-	Comments  []Comment `json:"comments,omitempty"`
+	Comments  []Comment `json:"comments,omitempty" gorm:"constraint:OnUpdate:CASCADE;OnDelete:CASCADE;"`
 	Tags      []Tag     `json:"tags,omitempty" gorm:"many2many:blogs_tags;constraint:OnUpdate:CASCADE;OnDelete:CASCADE;"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
