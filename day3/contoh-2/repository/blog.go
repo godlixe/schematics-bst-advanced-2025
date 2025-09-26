@@ -27,7 +27,7 @@ func (r *BlogRepository) Create(blog *model.Blog) (*model.Blog, error) {
 
 func (r *BlogRepository) GetByID(id int) (*model.Blog, error) {
 	var blog model.Blog
-	tx := r.db.Where("id = ?", id).First(&blog)
+	tx := r.db.Preload("Comments").Preload("Tags").Where("id = ?", id).First(&blog)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -37,7 +37,7 @@ func (r *BlogRepository) GetByID(id int) (*model.Blog, error) {
 
 func (r *BlogRepository) GetAll() ([]model.Blog, error) {
 	var blogs []model.Blog
-	tx := r.db.Preload("Comments").Find(&blogs)
+	tx := r.db.Preload("Comments").Preload("Tags").Find(&blogs)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

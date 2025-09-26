@@ -27,11 +27,20 @@ func (r *TagRepository) CreateBatch(tags []model.Tag) ([]model.Tag, error) {
 
 func (r *TagRepository) GetByBlogID(blogID int) ([]model.Tag, error) {
 	var tags []model.Tag
-	tx := r.db.Where("blog_id = ?", blogID).First(&tags)
+	tx := r.db.Table("tags").Select("tags.*").Joins("JOIN blogs_tags bt ON bt.tag_id = tags.id").Where("bt.blog_id = ?", blogID).Find(&tags)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
+	return tags, nil
+}
+
+func (r *TagRepository) GetAll() ([]model.Tag, error) {
+	var tags []model.Tag
+	tx := r.db.Find(&tags)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 	return tags, nil
 }
 
@@ -41,5 +50,35 @@ func (r *TagRepository) Delete(id int) error {
 		return tx.Error
 	}
 
+	return nil
+}
+
+func (r *TagRepository) AddTagsToBlog(blogID int, tagIDs []int) error {
+	var blog model.Blog
+	if err := r.db.First(&blog, blogID).Error; err != nil {
+		return err
+	}
+	var tags []model.Tag
+	if err := r.db.Where("id IN ?", tagIDs).Find(&tags).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&blog).Association("Tags").Append(&tags); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *TagRepository) RemoveTagsFromBlog(blogID int, tagIDs []int) error {
+	var blog model.Blog
+	if err := r.db.First(&blog, blogID).Error; err != nil {
+		return err
+	}
+	var tags []model.Tag
+	if err := r.db.Where("id IN ?", tagIDs).Find(&tags).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&blog).Association("Tags").Delete(&tags); err != nil {
+		return err
+	}
 	return nil
 }

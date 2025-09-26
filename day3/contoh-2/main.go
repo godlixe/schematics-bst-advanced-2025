@@ -23,20 +23,25 @@ func main() {
 		model.Blog{},
 		model.User{},
 		model.Comment{},
+		model.Tag{},
+		model.BlogsTags{},
 	)
 
 	blogRepo := repository.NewBlogRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	commentRepo := repository.NewCommentRepository(db)
+	tagRepo := repository.NewTagRepository(db)
 
 	blogSvc := service.NewBlogService(userRepo, blogRepo)
 	jwtSvc := service.NewJWTService()
 	userSvc := service.NewUserService(jwtSvc, userRepo)
 	commentSvc := service.NewCommentService(commentRepo)
+	tagSvc := service.NewTagService(tagRepo)
 
 	blogCtrl := controller.NewBlogController(blogSvc)
 	userCtrl := controller.NewUserController(userSvc)
 	commentCtrl := controller.NewCommentController(commentSvc)
+	tagCtrl := controller.NewTagController(tagSvc)
 
 	r := gin.Default()
 	r.Use(gin.Recovery())
@@ -45,6 +50,7 @@ func main() {
 	routes.BlogRoutes(r, blogCtrl, jwtSvc)
 	routes.UserRoutes(r, userCtrl, jwtSvc)
 	routes.CommentRoutes(r, commentCtrl, jwtSvc)
+	routes.TagRoutes(r, tagCtrl, jwtSvc)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)

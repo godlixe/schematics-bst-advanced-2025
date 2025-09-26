@@ -53,7 +53,7 @@ func (s *blogService) Update(blog *model.Blog) (*model.Blog, error) {
 	if existing.UserID != blog.UserID {
 		return nil, errors.New("unauthorized action")
 	}
-	return s.blogRepository.Update(existing)
+	return s.blogRepository.Update(blog)
 }
 
 func (s *blogService) Delete(id int) error {
